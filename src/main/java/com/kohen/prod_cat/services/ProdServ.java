@@ -30,20 +30,20 @@ public class ProdServ {
 		return catRepo.save(newCategory);
 	}
 
-	public List<Category> getCats() {
+	public List<Category> getCategories() {
 		return (List<Category>) catRepo.findAll();
 	}
 
-	public List<Product> getProds() {
+	public List<Product> getProducts() {
 		return (List<Product>) prodRepo.findAll();
 	}
 
-	public Category getCat(Long id) {
+	public Category getCategory(Long id) {
 		Optional<Category> Category = catRepo.findById(id);
 		return Category.isPresent() ? Category.get() : null;
 	}
 
-	public Product getProd(Long id) {
+	public Product getProduct(Long id) {
 		Optional<Product> Product = prodRepo.findById(id);
 		return Product.isPresent() ? Product.get() : null;
 	}
@@ -61,12 +61,13 @@ public class ProdServ {
 		}
 	}
 
-	public Product createProdWithCat(Product newProdPlus) {
-		List<Category> Cat = new ArrayList<Category>();
-		for (String CatName : newProdPlus.getCatInput().split(",")) {
-			Cat.add(createOrRetrieve(CatName));
+	public Product createProductWithCategory(Product newProductPlus) {
+		List<Category> Category = new ArrayList<Category>();
+		for (String CategoryName : newProductPlus.getCategoryInput().split(",")) {
+			Category.add(createOrRetrieve(CategoryName));
 		}
-		newProdPlus.setCategories(Cat);
-		return prodRepo.save(newProdPlus);
+		newProductPlus.setCategories(Category);
+		return prodRepo.save(newProductPlus);
 	}
+
 }

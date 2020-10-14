@@ -29,8 +29,8 @@ public class IndexController {
 	public String index(Model model) {
 		model.addAttribute("newProduct", new Product());
 		model.addAttribute("newCategory", new Category());
-		model.addAttribute("allProds", prodServ.getProds());
-		model.addAttribute("allCats", prodServ.getCats());
+		model.addAttribute("allProducts", prodServ.getProducts());
+		model.addAttribute("allCategories", prodServ.getCategories());
 		return "index";
 	}
 
@@ -45,39 +45,40 @@ public class IndexController {
 	}
 
 	@PostMapping("/categories")
-	public String newCategory(@Valid @ModelAttribute("newCat") Category newCat, BindingResult result) {
+	public String newCategory(@Valid @ModelAttribute("newCategory") Category newCategory, BindingResult result) {
 		if (result.hasErrors()) {
 			return "index";
 		} else {
-			prodServ.create(newCat);
+			prodServ.create(newCategory);
 			return "redirect:/";
 		}
 	}
 
 	@PostMapping("/add_category")
-	public String addCatProd(@RequestParam("prod_id") Long prodId, @RequestParam("cat_id") Long catId) {
-		Product theProd = prodServ.getProd(prodId);
-		Category theCat = prodServ.getCat(catId);
-		List<Category> productCategories = theProd.getCategories();
-		productCategories.add(theCat);
-		prodServ.saveProduct(theProd);
+	public String addCategoryToProduct(@RequestParam("product_id") Long productId,
+			@RequestParam("category_id") Long categoryId) {
+		Product theProduct = prodServ.getProduct(productId);
+		Category theCategory = prodServ.getCategory(categoryId);
+		List<Category> productCategories = theProduct.getCategories();
+		productCategories.add(theCategory);
+		prodServ.saveProduct(theProduct);
 		return "redirect:/";
 	}
 
 	public String newProductPlus(Model model) {
 		model.addAttribute("newProductPlus", new Product());
-		model.addAttribute("allProducts", prodServ.getProds());
+		model.addAttribute("allProducts", prodServ.getProducts());
 		return "product";
 	}
 
-	@PostMapping("/Products/new")
-	public String createProductWithCategorys(@Valid @ModelAttribute("newProductPlus") Product newProductPlus,
+	@PostMapping("/products/new")
+	public String createProductWithCategories(@Valid @ModelAttribute("newProductPlus") Product newProductPlus,
 			BindingResult result, Model model) {
 		if (result.hasErrors()) {
-			model.addAttribute("allProducts", prodServ.getProds());
+			model.addAttribute("allProducts", prodServ.getProducts());
 			return "product";
 		} else {
-			prodServ.createProdWithCat(newProductPlus);
+			prodServ.createProductWithCategory(newProductPlus);
 			return "redirect:/products/new";
 		}
 	}

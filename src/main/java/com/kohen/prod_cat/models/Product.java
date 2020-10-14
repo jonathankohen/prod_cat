@@ -36,7 +36,10 @@ public class Product {
 	private double price;
 
 	@Transient
-	private String catInput;
+	private String categoryInput;
+
+	@Transient
+	private String productInput;
 
 	@Column(updatable = false)
 	private Date createdAt;
@@ -50,12 +53,12 @@ public class Product {
 
 	}
 
-	public String getCatInput() {
-		return catInput;
+	public String getCategoryInput() {
+		return categoryInput;
 	}
 
-	public void setCatInput(String catInput) {
-		this.catInput = catInput;
+	public void setCategoryInput(String categoryInput) {
+		this.categoryInput = categoryInput;
 	}
 
 	public Long getId() {
@@ -122,5 +125,16 @@ public class Product {
 	@PreUpdate
 	protected void onUpdate() {
 		this.updatedAt = new Date();
+	}
+
+	public String categoryDescription() {
+		String result = "";
+		for (int i = 0; i < categories.size(); i++) {
+			result += categories.get(i).getName();
+			if (i < categories.size() - 1) {
+				result += ", ";
+			}
+		}
+		return result;
 	}
 }
