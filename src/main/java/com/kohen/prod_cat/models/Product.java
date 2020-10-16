@@ -12,11 +12,12 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -26,13 +27,12 @@ public class Product {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@NotNull(message = "Name is required.")
+	@Size(min = 2, max = 200, message = "Name must be 2 characters or longer.")
 	private String name;
 
 	@Size(min = 5, max = 200, message = "Description must be 5 characters or longer.")
 	private String description;
 
-	@NotNull(message = "Price is required.")
 	private double price;
 
 	@Transient
@@ -49,16 +49,23 @@ public class Product {
 	@JoinTable(name = "categories_products", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
 	private List<Category> categories;
 
+	@OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+	private List<Review> reviews;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id")
+	private User user;
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
 	public Product() {
 
-	}
-
-	public String getCategoryInput() {
-		return categoryInput;
-	}
-
-	public void setCategoryInput(String categoryInput) {
-		this.categoryInput = categoryInput;
 	}
 
 	public Long getId() {
@@ -91,6 +98,30 @@ public class Product {
 
 	public void setPrice(double price) {
 		this.price = price;
+	}
+
+	public String getProductInput() {
+		return productInput;
+	}
+
+	public void setProductInput(String productInput) {
+		this.productInput = productInput;
+	}
+
+	public String getCategoryInput() {
+		return categoryInput;
+	}
+
+	public void setCategoryInput(String categoryInput) {
+		this.categoryInput = categoryInput;
+	}
+
+	public List<Review> getReviews() {
+		return reviews;
+	}
+
+	public void setReviews(List<Review> reviews) {
+		this.reviews = reviews;
 	}
 
 	public Date getCreatedAt() {
@@ -127,7 +158,7 @@ public class Product {
 		this.updatedAt = new Date();
 	}
 
-	public String categoryDescription() {
+	public String categoriesDescription() {
 		String result = "";
 		for (int i = 0; i < categories.size(); i++) {
 			result += categories.get(i).getName();
@@ -136,5 +167,16 @@ public class Product {
 			}
 		}
 		return result;
+	}
+
+	public Double getAverageRating() {
+		if (reviews.size() == 0) {
+			return 0d;
+		}
+		Double total = 0d;
+		for (Review r : reviews) {
+			total += r.getRating();
+		}
+		return total / reviews.size();
 	}
 }

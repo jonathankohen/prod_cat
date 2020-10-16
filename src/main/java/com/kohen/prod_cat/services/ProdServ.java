@@ -8,18 +8,22 @@ import org.springframework.stereotype.Service;
 
 import com.kohen.prod_cat.models.Category;
 import com.kohen.prod_cat.models.Product;
+import com.kohen.prod_cat.models.Review;
 import com.kohen.prod_cat.repos.CatRepo;
 import com.kohen.prod_cat.repos.ProdRepo;
+import com.kohen.prod_cat.repos.RevRepo;
 
 @Service
 public class ProdServ {
 
 	private static ProdRepo prodRepo;
 	private static CatRepo catRepo;
+	private static RevRepo revRepo;
 
-	public ProdServ(ProdRepo prodRepo, CatRepo catRepo) {
+	public ProdServ(ProdRepo prodRepo, CatRepo catRepo, RevRepo revRepo) {
 		ProdServ.prodRepo = prodRepo;
 		ProdServ.catRepo = catRepo;
+		ProdServ.revRepo = revRepo;
 	}
 
 	public Product create(Product newProduct) {
@@ -28,6 +32,16 @@ public class ProdServ {
 
 	public Category create(Category newCategory) {
 		return catRepo.save(newCategory);
+	}
+
+	public Review create(Review newReview) {
+		List<Review> matchingReviews = revRepo.matchingReviews(newReview.getUser().getId(),
+				newReview.getProduct().getId());
+		if (matchingReviews.size() > 0) {
+			return null;
+		}
+		newReview.setId(null);
+		return revRepo.save(newReview);
 	}
 
 	public List<Category> getCategories() {
@@ -39,17 +53,17 @@ public class ProdServ {
 	}
 
 	public Category getCategory(Long id) {
-		Optional<Category> Category = catRepo.findById(id);
-		return Category.isPresent() ? Category.get() : null;
+		Optional<Category> category = catRepo.findById(id);
+		return category.isPresent() ? category.get() : null;
 	}
 
 	public Product getProduct(Long id) {
-		Optional<Product> Product = prodRepo.findById(id);
-		return Product.isPresent() ? Product.get() : null;
+		Optional<Product> product = prodRepo.findById(id);
+		return product.isPresent() ? product.get() : null;
 	}
 
-	public Product saveProduct(Product Product) {
-		return prodRepo.save(Product);
+	public Product saveProduct(Product product) {
+		return prodRepo.save(product);
 	}
 
 	public Category createOrRetrieve(String categoryName) {
@@ -61,13 +75,18 @@ public class ProdServ {
 		}
 	}
 
-	public Product createProductWithCategory(Product newProductPlus) {
-		List<Category> Category = new ArrayList<Category>();
-		for (String CategoryName : newProductPlus.getCategoryInput().split(",")) {
-			Category.add(createOrRetrieve(CategoryName));
+	public Product createProductWithCategories(Product newProductPlus) {
+		List<Category> categories = new ArrayList<Category>();
+		for (String categoryName : newProductPlus.getCategoryInput().split(",")) {
+			categories.add(createOrRetrieve(categoryName));
 		}
-		newProductPlus.setCategories(Category);
+		newProductPlus.setCategories(categories);
 		return prodRepo.save(newProductPlus);
+	}
+
+	public List<Product> productsInCategory(String category) {
+		Optional<Category> c = catRepo.findCategoryByName(category);
+		return c.isPresent() ? c.get().getProducts() : new ArrayList<Product>();
 	}
 
 }

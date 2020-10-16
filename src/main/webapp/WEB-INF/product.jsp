@@ -13,9 +13,9 @@
 </head>
 <body>
     <div class="container">    
-        <h1>Products and Categories</h1>
+        <h1>${title}</h1>
         <div class="row">
-           <div class="col-sm-6">
+           <div class="col-sm-4">
                <form:form action="/products/new" method="post" modelAttribute="newProductPlus">
                    <div class="form-group">
                        <label>Name</label>
@@ -34,26 +34,28 @@
                    </div>
                    <div class="form-group">
                        <label>Categories</label>
-                       <form:input path="categoriesInput" class="form-control" />
-                       <form:errors path="categoriesInput" class="text-danger" />
+                       <form:input path="categoryInput" class="form-control" />
+                       <form:errors path="categoryInput" class="text-danger" />
                    </div>
-                   <input type="submit" value="Add Game" class="btn btn-primary" />
+                   <input type="submit" value="Add Product" class="btn btn-primary" />
                </form:form>
            </div>
-           <div class="col-sm-6">
+           <div class="col-sm-8">
                <table class="table">
                    <tr>
                        <th>Name</th>
                        <th>Description</th>
                        <th>Price</th>
                        <th>Categories</th>
+                       <th>Average Rating</th>
                    </tr>
-                   <c:forEach items="${allProds}" var="game">
+                   <c:forEach items="${allProducts}" var="product">
                       <tr>
-                          <td>${product.name}</td>
+                          <td><a href="/products/${product.id}">${product.name}</a></td>
                           <td>${product.description}</td>
                           <td>${product.price}</td>
                           <td>${product.categoriesDescription()}</td>
+                          <td>${product.getAverageRating()}</td>
                       </tr>
                    </c:forEach>
                 </table>
